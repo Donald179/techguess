@@ -1,7 +1,5 @@
 /**
- * TECHGEST — Noyau Partagé Multi-Pages (assets/js/layout.js)
- * Gère la navigation latérale/mobile, le statut En ligne / Hors ligne,
- * la synchronisation IndexedDB ↔ Supabase et la garde d'authentification sur chaque page HTML.
+ * TECHGEST — Noyau Partagé Multi-Pages avec Navigation Fluide (SPA / PJAX)
  */
 const TechGestLayout = (() => {
   let workspace = null;
@@ -140,6 +138,7 @@ const TechGestLayout = (() => {
     }
 
     updateNetworkBadge();
+    setupSeamlessNavigation();
   }
 
   function updateNetworkBadge() {
@@ -213,6 +212,81 @@ const TechGestLayout = (() => {
     }
   }
 
+  // --- NAVIGATION FLUIDE SANS RECHARGEMENT (SPA / PJAX) ---
+  function setupSeamlessNavigation() {
+    document.addEventListener("click", async (e) => {
+      const link = e.target.closest("a");
+      if (!link) return;
+      const href = link.getAttribute("href");
+
+      if (
+        href &&
+        href.endsWith(".html") &&
+        !href.startsWith("http") &&
+        !link.hasAttribute("target") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.shiftKey
+      ) {
+        e.preventDefault();
+        await navigateTo(href);
+      }
+    });
+
+    window.addEventListener("popstate", async () => {
+      await navigateTo(window.location.pathname.split("/").pop() || "index.html", false);
+    });
+  }
+
+  async function navigateTo(url, push = true) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Page introuvable");
+      const htmlText = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, "text/html");
+
+      const newMain = doc.querySelector("main") || doc.querySelector(".container") || doc.body;
+      const currentMain = document.querySelector("main") || document.querySelector(".container");
+
+      if (newMain && currentMain) {
+        currentMain.innerHTML = newMain.innerHTML;
+      }
+
+      if (push) {
+        window.history.pushState({}, "", url);
+      }
+
+      // Mise à jour de l'état actif dans les menus
+      document.querySelectorAll(".tg-nav-link, .tg-mobile-nav a").forEach((el) => {
+        const h = el.getAttribute("href");
+        if (h && h.includes(url)) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+        }
+      });
+
+      // Exécuter et charger dynamiquement le script de la page cible
+      const scripts = doc.querySelectorAll("script");
+      scripts.forEach((script) => {
+        if (script.src && !script.src.includes("layout.js") && !script.src.includes("db.js") && !script.src.includes("supabase")) {
+          const existing = document.querySelector(`script[src="${script.src}"]`);
+          if (!existing) {
+            const s = document.createElement("script");
+            s.src = script.src;
+            document.body.appendChild(s);
+          } else {
+            const evt = new Event("DOMContentLoaded");
+            document.dispatchEvent(evt);
+          }
+        }
+      });
+    } catch (err) {
+      window.location.href = url;
+    }
+  }
+
   async function initPage(activeKey, onReady) {
     onDataRefreshCallback = onReady;
 
@@ -220,7 +294,7 @@ const TechGestLayout = (() => {
       navigator.serviceWorker.register("./service-worker.js").catch(() => {});
     }
 
-    // 1. CHARGEMENT INSTANTANÉ DEPUIS LE CACHE LOCAL (Zéro attente réseau)
+    // 1. CHARGEMENT ULTRA-RAPIDE : Lecture prioritaire d'IndexedDB
     const cached = await TechGestDB.loadWorkspace();
     if (cached) {
       workspace = cached;
@@ -230,7 +304,6 @@ const TechGestLayout = (() => {
         onReady(workspace, syncQueue);
       }
     } else {
-      // Si aucun cache, tentative de récupération synchrone initiale
       try {
         if (TechGestSupabase.isConfigured()) {
           const fresh = await TechGestSupabase.fetchWorkspace();
@@ -253,14 +326,13 @@ const TechGestLayout = (() => {
       }
     }
 
-    // 2. SYNCHRONISATION EN ARRIÈRE-PLAN AVEC SUPABASE (Non bloquante)
+    // 2. SYNCHRONISATION DISCRÈTE EN ARRIÈRE-PLAN
     if (TechGestSupabase.isConfigured() && navigator.onLine) {
       TechGestSupabase.fetchWorkspace().then(async (fresh) => {
         if (fresh) {
           workspace = fresh;
           await TechGestDB.saveWorkspace(workspace);
           syncQueue = await TechGestDB.getQueue(String(workspace.user.id));
-          renderShell(activeKey);
           if (onReady) {
             onReady(workspace, syncQueue);
           }
