@@ -1,0 +1,12 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE PAGE PRESTATIONS (assets/css/prestations.css)
+============================================================================ */
+
+#input-auto-ref {
+  background-color: #F3F6FB;
+}
+
+.tg-status-select {
+  width: 135px;
+  font-weight: 600;
+}

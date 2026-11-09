@@ -1,0 +1,23 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE PAGE CLIENTS (assets/css/clients.css)
+============================================================================ */
+
+.tg-search-input {
+  max-width: 420px;
+}
+
+.tg-client-card {
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.tg-client-card:hover {
+  border-color: #2685D8;
+  transform: translateY(-2px);
+}
+
+.tg-client-stat-box {
+  background-color: #F3F6FB;
+  border-radius: 0.65rem;
+  padding: 0.45rem;
+  text-align: center;
+}

@@ -1,0 +1,21 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE TABLEAU DE BORD (assets/css/dashboard.css)
+============================================================================ */
+
+.tg-chart-box {
+  position: relative;
+  height: 265px;
+  width: 100%;
+}
+
+.tg-unpaid-item {
+  background-color: #F3F6FB;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+}
+
+.tg-payment-row {
+  background-color: #F3F6FB;
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.85rem;
+}

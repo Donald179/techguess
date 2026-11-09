@@ -1,0 +1,9 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE RAPPORTS FINANCIERS (assets/css/rapports.css)
+============================================================================ */
+
+.tg-report-chart-box {
+  position: relative;
+  height: 270px;
+  width: 100%;
+}

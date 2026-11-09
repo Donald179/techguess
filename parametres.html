@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#102B46" />
+  <title>TECHGEST — Paramètres &amp; Synchronisation Hors Ligne</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/images/icon.ico" type="image/x-icon" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="./assets/css/shared.css" rel="stylesheet" />
+  <link href="./assets/css/parametres.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="tg-toast-container"></div>
+  <div id="tg-sidebar-mount"></div>
+
+  <div class="tg-main">
+    <div id="tg-topbar-mount"></div>
+
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="mb-4">
+        <h1 class="h4 fw-bold mb-0">Paramètres &amp; Moniteur Offline-First</h1>
+        <small class="text-muted">Profil commercial pour vos factures PDF et gestion de la file de synchronisation IndexedDB ↔ Supabase</small>
+      </div>
+
+      <div class="row g-4">
+        <!-- Profil Professionnel -->
+        <div class="col-lg-6">
+          <div class="tg-card p-4">
+            <h2 class="h6 fw-bold mb-3">Profil professionnel (En-tête des factures PDF)</h2>
+            <form id="form-settings-profile" class="vstack gap-3 small">
+              <div>
+                <label class="form-label fw-bold mb-1">Nom commercial *</label>
+                <input type="text" name="businessName" id="set-biz-name" class="form-control form-control-sm" required />
+              </div>
+              <div>
+                <label class="form-label fw-bold mb-1">Slogan / Spécialité</label>
+                <input type="text" name="tagline" id="set-tagline" class="form-control form-control-sm" />
+              </div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label fw-bold mb-1">Téléphone</label>
+                  <input type="text" name="phone" id="set-phone" class="form-control form-control-sm" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold mb-1">Email</label>
+                  <input type="email" name="email" id="set-email" class="form-control form-control-sm" />
+                </div>
+              </div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label fw-bold mb-1">Adresse</label>
+                  <input type="text" name="address" id="set-address" class="form-control form-control-sm" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold mb-1">IFU / RCCM</label>
+                  <input type="text" name="taxId" id="set-tax" class="form-control form-control-sm" />
+                </div>
+              </div>
+              <div>
+                <label class="form-label fw-bold mb-1">Pied de page des factures PDF</label>
+                <textarea name="invoiceFooter" id="set-footer" rows="2" class="form-control form-control-sm"></textarea>
+              </div>
+              <button type="submit" class="btn tg-btn-primary btn-sm">Enregistrer le profil</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- File de Synchronisation IndexedDB -->
+        <div class="col-lg-6">
+          <div class="tg-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h2 class="h6 fw-bold mb-0">File d'attente IndexedDB (sync_queue)</h2>
+                <small class="text-muted">Opérations locales en attente de confirmation serveur</small>
+              </div>
+              <button type="button" id="btn-page-sync-now" class="btn tg-btn-green btn-sm">Synchroniser maintenant</button>
+            </div>
+            <div id="sync-queue-container"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="tg-mobilenav-mount"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./assets/js/supabase-config.js"></script>
+  <script src="./assets/js/db.js"></script>
+  <script src="./assets/js/supabase-service.js"></script>
+  <script src="./assets/js/sync.js"></script>
+  <script src="./assets/js/pdf-export.js"></script>
+  <script src="./assets/js/layout.js"></script>
+  <script src="./assets/js/parametres.js"></script>
+</body>
+</html>

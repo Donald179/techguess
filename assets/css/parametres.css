@@ -1,0 +1,16 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE PARAMÈTRES & SYNCHRO (assets/css/parametres.css)
+============================================================================ */
+
+.tg-queue-card {
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 0.85rem;
+  margin-bottom: 0.65rem;
+  background-color: #F8FAFC;
+}
+
+.tg-queue-card.conflict {
+  border-color: #DC2626;
+  background-color: rgba(220, 38, 38, 0.06);
+}

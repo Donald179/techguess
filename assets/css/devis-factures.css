@@ -1,0 +1,14 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE DEVIS & FACTURES (assets/css/devis-factures.css)
+============================================================================ */
+
+.tg-doc-item {
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  transition: background-color 0.15s ease;
+}
+
+.tg-doc-item:hover {
+  background-color: #F8FAFC;
+}

@@ -1,0 +1,9 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE PAGE PAIEMENTS (assets/css/paiements.css)
+============================================================================ */
+
+.tg-collected-pill {
+  background-color: rgba(22, 163, 106, 0.14);
+  color: #16A36A;
+  border: 1px solid rgba(22, 163, 106, 0.25);
+}

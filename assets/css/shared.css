@@ -1,0 +1,210 @@
+/* ============================================================================
+   TECHGEST — FEUILLE DE STYLE GLOBALE PARTAGÉE (assets/css/shared.css)
+   Bleu nuit : #102B46 | Bleu principal : #2685D8 | Blanc : #FFFFFF
+   Gris clair : #F3F6FB | Vert : #16A36A
+============================================================================ */
+
+:root {
+  --tg-navy: #102B46;
+  --tg-navy-hover: #183c60;
+  --tg-blue: #2685D8;
+  --tg-blue-hover: #1e70b8;
+  --tg-white: #FFFFFF;
+  --tg-bg: #F3F6FB;
+  --tg-green: #16A36A;
+  --tg-border: #E2E8F0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--tg-bg);
+  color: var(--tg-navy);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+}
+
+/* Sidebar Desktop */
+.tg-sidebar {
+  width: 260px;
+  background-color: var(--tg-navy);
+  color: var(--tg-white);
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1030;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.tg-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--tg-white);
+  padding: 0.5rem 0.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 1rem;
+}
+
+.tg-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-decoration: none;
+  color: #CBD5E1;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.75rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  margin-bottom: 0.25rem;
+}
+
+.tg-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--tg-white);
+}
+
+.tg-nav-link.active {
+  background-color: var(--tg-blue);
+  color: var(--tg-white);
+  box-shadow: 0 4px 12px rgba(38, 133, 216, 0.32);
+}
+
+/* Main Content Area */
+.tg-main {
+  margin-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 991.98px) {
+  .tg-sidebar {
+    display: none;
+  }
+  .tg-main {
+    margin-left: 0;
+    padding-bottom: 76px;
+  }
+}
+
+/* Topbar */
+.tg-topbar {
+  background-color: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--tg-border);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  padding: 0.65rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Cards & Buttons */
+.tg-card {
+  background-color: var(--tg-white);
+  border: 1px solid var(--tg-border);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(16, 43, 70, 0.03);
+}
+
+.tg-card-navy {
+  background-color: var(--tg-navy);
+  color: var(--tg-white);
+  border-radius: 1rem;
+  box-shadow: 0 6px 18px rgba(16, 43, 70, 0.14);
+}
+
+.tg-btn-primary {
+  background-color: var(--tg-blue);
+  border-color: var(--tg-blue);
+  color: var(--tg-white);
+  font-weight: 600;
+  border-radius: 0.7rem;
+}
+
+.tg-btn-primary:hover {
+  background-color: var(--tg-blue-hover);
+  color: var(--tg-white);
+}
+
+.tg-btn-navy {
+  background-color: var(--tg-navy);
+  border-color: var(--tg-navy);
+  color: var(--tg-white);
+  font-weight: 600;
+  border-radius: 0.7rem;
+}
+
+.tg-btn-navy:hover {
+  background-color: var(--tg-navy-hover);
+  color: var(--tg-white);
+}
+
+.tg-btn-green {
+  background-color: var(--tg-green);
+  border-color: var(--tg-green);
+  color: var(--tg-white);
+  font-weight: 600;
+  border-radius: 0.7rem;
+}
+
+.tg-btn-green:hover {
+  background-color: #128757;
+  color: var(--tg-white);
+}
+
+.tg-text-green { color: var(--tg-green) !important; }
+.tg-text-blue { color: var(--tg-blue) !important; }
+.tg-text-navy { color: var(--tg-navy) !important; }
+
+/* Badges */
+.badge-soft-green { background-color: rgba(22, 163, 106, 0.14); color: #16A36A; }
+.badge-soft-blue { background-color: rgba(38, 133, 216, 0.14); color: #2685D8; }
+.badge-soft-amber { background-color: rgba(245, 158, 11, 0.16); color: #B45309; }
+.badge-soft-red { background-color: rgba(220, 38, 38, 0.14); color: #DC2626; }
+
+/* Mobile Bottom Nav */
+.tg-mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tg-white);
+  border-top: 1px solid var(--tg-border);
+  z-index: 1030;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 6px 4px;
+}
+
+.tg-mobile-nav a {
+  text-decoration: none;
+  color: #64748B;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 2px;
+}
+
+.tg-mobile-nav a.active {
+  color: var(--tg-blue);
+}
+
+/* Toast Container */
+#tg-toast-container {
+  position: fixed;
+  bottom: 76px;
+  right: 18px;
+  z-index: 2050;
+  max-width: 380px;
+}
