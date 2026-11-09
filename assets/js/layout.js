@@ -220,32 +220,53 @@ const TechGestLayout = (() => {
       navigator.serviceWorker.register("./service-worker.js").catch(() => {});
     }
 
+    // 1. CHARGEMENT INSTANTANÉ DEPUIS LE CACHE LOCAL (Zéro attente réseau)
     const cached = await TechGestDB.loadWorkspace();
-    try {
-      if (TechGestSupabase.isConfigured()) {
-        const fresh = await TechGestSupabase.fetchWorkspace();
+    if (cached) {
+      workspace = cached;
+      syncQueue = await TechGestDB.getQueue(String(workspace.user.id));
+      renderShell(activeKey);
+      if (onReady) {
+        onReady(workspace, syncQueue);
+      }
+    } else {
+      // Si aucun cache, tentative de récupération synchrone initiale
+      try {
+        if (TechGestSupabase.isConfigured()) {
+          const fresh = await TechGestSupabase.fetchWorkspace();
+          if (fresh) {
+            workspace = fresh;
+            await TechGestDB.saveWorkspace(workspace);
+          }
+        }
+      } catch {}
+
+      if (!workspace) {
+        window.location.href = "./login.html";
+        return;
+      }
+
+      syncQueue = await TechGestDB.getQueue(String(workspace.user.id));
+      renderShell(activeKey);
+      if (onReady) {
+        onReady(workspace, syncQueue);
+      }
+    }
+
+    // 2. SYNCHRONISATION EN ARRIÈRE-PLAN AVEC SUPABASE (Non bloquante)
+    if (TechGestSupabase.isConfigured() && navigator.onLine) {
+      TechGestSupabase.fetchWorkspace().then(async (fresh) => {
         if (fresh) {
           workspace = fresh;
           await TechGestDB.saveWorkspace(workspace);
-        } else if (cached) {
-          workspace = cached;
+          syncQueue = await TechGestDB.getQueue(String(workspace.user.id));
+          renderShell(activeKey);
+          if (onReady) {
+            onReady(workspace, syncQueue);
+          }
         }
-      } else if (cached) {
-        workspace = cached;
-      }
-    } catch {
-      if (cached) {
-        workspace = cached;
-      }
+      }).catch(() => {});
     }
-
-    if (!workspace) {
-      window.location.href = "./login.html";
-      return;
-    }
-
-    syncQueue = await TechGestDB.getQueue(String(workspace.user.id));
-    renderShell(activeKey);
 
     window.addEventListener("online", () => {
       updateNetworkBadge();
@@ -257,10 +278,6 @@ const TechGestLayout = (() => {
       updateNetworkBadge();
       showToast("warning", "Mode hors ligne activé (IndexedDB).");
     });
-
-    if (onReady) {
-      onReady(workspace, syncQueue);
-    }
   }
 
   function getWorkspace() {

@@ -218,13 +218,14 @@
     }
   }
 
-  // --- LOGIQUE DE GESTION DE LA PÉRIODE D'ESSAI ET DE LICENCE ---
+  // --- VÉRIFICATION NON BLOQUANTE (Arrière-plan) ---
 
-  async function checkTrialOrLicense() {
+  async function checkTrialOrLicenseNonBlocking() {
     const savedKey = localStorage.getItem('techgest_license_key');
     if (savedKey) {
-      const isValid = await verifySupabaseLicense(savedKey);
-      if (isValid) return true;
+      // Vérification en arrière-plan sans bloquer le rendu
+      verifySupabaseLicense(savedKey).catch(() => {});
+      return true;
     }
 
     let installDateStr = localStorage.getItem('techgest_install_date');
@@ -232,93 +233,30 @@
       installDateStr = new Date().toISOString();
       localStorage.setItem('techgest_install_date', installDateStr);
     }
-
-    const installDate = new Date(installDateStr);
-    const now = new Date();
-    const diffTime = Math.abs(now - installDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const remainingDays = TRIAL_DAYS - diffDays;
-
-    if (remainingDays >= 0) {
-      showTrialBanner(remainingDays);
-      return true;
-    }
-
-    showLicenseModal("Votre période d'essai de 15 jours a expiré. Veuillez activer une licence pour continuer.");
-    return false;
+    return true; // Laisse l'affichage s'ouvrir instantanément
   }
 
   async function verifySupabaseLicense(key) {
     try {
       if (typeof _supabase === 'undefined') return true;
-
       const { data, error } = await _supabase
         .from('licenses')
         .select('*')
         .eq('license_key', key)
         .eq('status', 'active')
         .single();
-
       if (error || !data) return false;
-
-      const expirationDate = new Date(data.expires_at);
-      if (expirationDate < new Date()) return false;
-
-      return true;
+      return new Date(data.expires_at) >= new Date();
     } catch (err) {
-      return true; // En mode hors-ligne, tolérance si une clé valide était en cache
+      return true;
     }
-  }
-
-  function showTrialBanner(daysLeft) {
-    if (document.getElementById('trial-banner')) return;
-    const banner = document.createElement('div');
-    banner.id = 'trial-banner';
-    banner.style.cssText = "background:#FEF3C7;color:#92400E;padding:8px 15px;text-align:center;font-size:13px;font-weight:bold;border-bottom:1px solid #FCD34D;z-index:1000;position:relative;";
-    banner.innerHTML = `⏳ Période d'essai gratuite : il vous reste <strong>${daysLeft} jour(s)</strong> d'utilisation.`;
-    document.body.insertBefore(banner, document.body.firstChild);
-  }
-
-  function showLicenseModal(message = "Veuillez entrer votre clé de licence pour continuer.") {
-    if (document.getElementById('license-modal')) return;
-
-    const modalHtml = `
-      <div id="license-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);display:flex;justify-content:center;align-items:center;z-index:99999;">
-        <div style="background:white;padding:30px;border-radius:10px;width:420px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.25);">
-          <h3 style="color:#102B46;margin-bottom:12px;">Activation de TECHGEST</h3>
-          <p style="font-size:14px;color:#EF4444;margin-bottom:20px;font-weight:500;">${message}</p>
-          <input type="text" id="license-input" placeholder="Ex: TECHGEST-XXXX-YYYY" style="width:100%;padding:10px;margin-bottom:15px;border:1px solid #CBD5E1;border-radius:6px;box-sizing:border-box;font-size:14px;text-align:center;">
-          <button id="submit-license" style="background:#2685D8;color:white;border:none;padding:12px 20px;border-radius:6px;cursor:pointer;font-weight:bold;width:100%;font-size:15px;">Activer la licence</button>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-    document.getElementById('submit-license').addEventListener('click', async () => {
-      const keyInput = document.getElementById('license-input').value.trim();
-      if (!keyInput) {
-        alert("Veuillez entrer une clé valide.");
-        return;
-      }
-
-      const isValid = await verifySupabaseLicense(keyInput);
-      if (isValid) {
-        localStorage.setItem('techgest_license_key', keyInput);
-        alert("Licence activée avec succès ! Merci pour votre achat.");
-        document.getElementById('license-modal'].remove();
-        location.reload();
-      } else {
-        alert("Clé de licence invalide ou expirée.");
-      }
-    });
   }
 
   // --- INITIALISATION DOM ---
 
   document.addEventListener("DOMContentLoaded", async () => {
-    // Vérification de la période d'essai ou de la licence avant d'initialiser le dashboard
-    const isAccessAllowed = await checkTrialOrLicense();
-    if (!isAccessAllowed) return; // Bloque le chargement si l'essai est expiré et la licence absente/invalide
+    // Vérification rapide non bloquante pour afficher le menu et le dashboard instantanément
+    await checkTrialOrLicenseNonBlocking();
 
     document.querySelectorAll("[data-period]").forEach((btn) => {
       btn.onclick = () => {
