@@ -8,6 +8,6 @@
  *    (trouvables dans Project Settings > API).
  */
 window.TECHGEST_SUPABASE_CONFIG = {
-  SUPABASE_URL: "https://VOTRE-PROJET.supabase.co",
-  SUPABASE_ANON_KEY: "VOTRE_CLE_PUBLIQUE_ANON_SUPABASE",
+  SUPABASE_URL: "https://yqqwnqqvslperxhwrqeg.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_eNMf-nZq7WXssalfTKI3jw__kRsrQ1T",
 };
