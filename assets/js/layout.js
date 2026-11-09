@@ -63,7 +63,7 @@ const TechGestLayout = (() => {
           <nav class="flex-grow-1">
             ${NAV_PAGES.map(
               (p) => `
-              <a href="${p.href}" class="tg-nav-link ${p.key === activeKey ? "active" : ""}">
+              <a href="${p.href}" data-key="${p.key}" class="tg-nav-link ${p.key === activeKey ? "active" : ""}">
                 <span>${p.label}</span>
               </a>`
             ).join("")}
@@ -114,7 +114,7 @@ const TechGestLayout = (() => {
           ${mobileItems
             .map(
               (m) =>
-                `<a href="${m.href}" class="${m.key === activeKey ? "active" : ""}">${m.label}</a>`
+                `<a href="${m.href}" data-key="${m.key}" class="${m.key === activeKey ? "active" : ""}">${m.label}</a>`
             )
             .join("")}
         </nav>
@@ -214,6 +214,10 @@ const TechGestLayout = (() => {
 
   // --- NAVIGATION FLUIDE SANS RECHARGEMENT (SPA / PJAX) ---
   function setupSeamlessNavigation() {
+    // Évite de dupliquer les écouteurs si déjà initialisé
+    if (window._techgestNavInitialized) return;
+    window._techgestNavInitialized = true;
+
     document.addEventListener("click", async (e) => {
       const link = e.target.closest("a");
       if (!link) return;
@@ -234,7 +238,20 @@ const TechGestLayout = (() => {
     });
 
     window.addEventListener("popstate", async () => {
-      await navigateTo(window.location.pathname.split("/").pop() || "index.html", false);
+      const page = window.location.pathname.split("/").pop() || "index.html";
+      await navigateTo(page, false);
+    });
+  }
+
+  function updateActiveStates(url) {
+    const targetPage = url.split("/").pop() || "index.html";
+    document.querySelectorAll(".tg-nav-link, .tg-mobile-nav a").forEach((el) => {
+      const href = el.getAttribute("href");
+      if (href && href.includes(targetPage)) {
+        el.classList.add("active");
+      } else {
+        el.classList.remove("active");
+      }
     });
   }
 
@@ -257,17 +274,10 @@ const TechGestLayout = (() => {
         window.history.pushState({}, "", url);
       }
 
-      // Mise à jour de l'état actif dans les menus
-      document.querySelectorAll(".tg-nav-link, .tg-mobile-nav a").forEach((el) => {
-        const h = el.getAttribute("href");
-        if (h && h.includes(url)) {
-          el.classList.add("active");
-        } else {
-          el.classList.remove("active");
-        }
-      });
+      // Mise à jour immédiate de la barre bleue active
+      updateActiveStates(url);
 
-      // Exécuter et charger dynamiquement le script de la page cible
+      // Exécuter et charger dynamiquement les scripts de la page cible si nécessaire
       const scripts = doc.querySelectorAll("script");
       scripts.forEach((script) => {
         if (script.src && !script.src.includes("layout.js") && !script.src.includes("db.js") && !script.src.includes("supabase")) {
@@ -326,7 +336,7 @@ const TechGestLayout = (() => {
       }
     }
 
-    // 2. SYNCHRONISATION DISCRÈTE EN ARRIÈRE-PLAN
+    // 2. SYNCHRONISATION DISCRÈTE EN ARRIÈRE-PLAN (sans bloquer l'affichage)
     if (TechGestSupabase.isConfigured() && navigator.onLine) {
       TechGestSupabase.fetchWorkspace().then(async (fresh) => {
         if (fresh) {
